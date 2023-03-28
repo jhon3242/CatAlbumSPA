@@ -6,15 +6,16 @@ const port = 8080;
 
 app.listen(port, () => console.log("Server running..."));
 
+
 app.get("/", (req, res) => {
     res.send("hello");
 })
 
 app.get("/api/root", (req, res) => {
     const result = [{"id":"1","name":"노란고양이","type":"DIRECTORY","filePath":null,"parent":null},{"id":"3","name":"까만고양이","type":"DIRECTORY","filePath":null,"parent":null},{"id":"10","name":"고등어무늬 고양이","type":"DIRECTORY","filePath":null,"parent":null},{"id":"13","name":"삼색이 고양이","type":"DIRECTORY","filePath":null,"parent":null},{"id":"14","name":"회색고양이","type":"DIRECTORY","filePath":null,"parent":null},{"id":"20","name":"하얀고양이","type":"DIRECTORY","filePath":null,"parent":null}];
-    res.send(result);
-    // res.send(JSON.stringify(result));
+    res.send(JSON.stringify(result));
 })
+
 
 app.get("/api/root/*", (req,res) => {
     const infos = {
