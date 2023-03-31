@@ -1,16 +1,13 @@
+const BASE_API_URL = "https://l9817xtkq3.execute-api.ap-northeast-2.amazonaws.com/dev/";
 
-
-const API_BASE_URL = "https://l9817xtkq3.execute-api.ap-northeast-2.amazonaws.com/dev/";
-const request = async (nodeId) => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/${nodeId ? nodeId : ""}`);
-        if (!response.ok) {
-            throw new Error("서버 요청에서 에러가 발생했습니다.");
-        }
-        return response.json();
-    } catch (err) {
-        throw new Error(`Error : ${err}`);
+export default async function request(nodeId){
+    const path = `${BASE_API_URL}${nodeId ? nodeId : ""}`;
+    console.log("requesting...");
+    const resopens = await fetch(path);
+    console.log("request done.");
+    if (!resopens.ok){
+        throw new Error("API 요청 에러");
     }
-}
 
-export default request;
+    return resopens.json();
+}
