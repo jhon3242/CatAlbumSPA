@@ -36,7 +36,7 @@ export default function App($app) {
             loading.showLoadingToggle();
         }, onBackClick : async () => {
             loading.showLoadingToggle();
-            const prevNode = this.state.depth[this.state.depth.length - 2];
+            const prevNode = this.state.depth[this.state.depth.현length - 2];
             const prevNodes = await request(prevNode?.id);
             setState({
                 isRoot : this.state.depth.length <= 1,
