@@ -4,6 +4,10 @@ import Nodes from "./Nodes.js"
 import ImageViews from "./ImageViews.js"
 import Loading from "./Loading.js"
 
+const caches = {
+
+}
+
 export default function App($app) {
 
     this.target = $app;
@@ -26,7 +30,13 @@ export default function App($app) {
                     selectedFilePath : node.filePath
                 })
             } else if (node.type === "DIRECTORY") {
-                const nextNodes = await request(node.id);
+                let nextNodes;
+                if (caches[node.id]) {
+                    nextNodes = caches[node.id];
+                } else {
+                    nextNodes = await request(node.id);
+                    caches[node.id] = nextNodes;
+                }
                 setState({
                     isRoot : false,
                     nodes : nextNodes,
@@ -36,8 +46,17 @@ export default function App($app) {
             loading.showLoadingToggle();
         }, onBackClick : async () => {
             loading.showLoadingToggle();
-            const prevNode = this.state.depth[this.state.depth.현length - 2];
-            const prevNodes = await request(prevNode?.id);
+            let prevNode = this.state.depth[this.state.depth.length - 2];
+            let prevNodes;
+            if (!prevNode) {
+                caches["root"] = caches["root"] ? caches["root"] : await request("");
+                prevNodes = caches["root"];
+            } else if (caches[prevNode.id]) {
+                prevNodes = caches[prevNode.id];
+            } else if (prevNodes && !caches[prevNode.id]) {
+                prevNodes = await request(prevNode?.id);
+            }
+
             setState({
                 isRoot : this.state.depth.length <= 1,
                 nodes : prevNodes,
@@ -63,6 +82,7 @@ export default function App($app) {
         try {
             loading.showLoadingToggle();
             const rootNodes = await request();
+            caches["root"] = rootNodes;
             const nextState = {
                 ...this.state,
                 isRoot : true,
