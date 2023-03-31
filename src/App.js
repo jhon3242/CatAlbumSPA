@@ -2,6 +2,7 @@ import request from "./api.js";
 import Breadcrumb from "./Breadcrumb.js"
 import Nodes from "./Nodes.js"
 import ImageViews from "./ImageViews.js"
+import Loading from "./Loading.js"
 
 export default function App($app) {
 
@@ -12,16 +13,13 @@ export default function App($app) {
         depth : [],
         selectedFilePath : null,
     }
-    const imageViews = new ImageViews({$app, initialState :
-        this.state.selectedFilePath
-        , onclick : () => {
 
-        }})
     const breadcrumb = new Breadcrumb({$app, initialState : this.state.depth});
     const nodes = new Nodes({$app, initialState: {
             isRoot : this.state.isRoot,
             nodes : this.state.nodes,
         }, onclick : async (node) => {
+            loading.showLoadingToggle();
             if (node.type === "FILE") {
                 setState({
                     ...this.state,
@@ -35,7 +33,9 @@ export default function App($app) {
                     depth : [...this.state.depth, node]
                 });
             }
+            loading.showLoadingToggle();
         }, onBackClick : async () => {
+            loading.showLoadingToggle();
             const prevNode = this.state.depth[this.state.depth.length - 2];
             const prevNodes = await request(prevNode?.id);
             setState({
@@ -43,7 +43,10 @@ export default function App($app) {
                 nodes : prevNodes,
                 depth : this.state.depth.splice(0, this.state.depth.length - 1)
             })
+            loading.showLoadingToggle();
         }})
+    const imageViews = new ImageViews({$app, initialState : this.state.selectedFilePath})
+    const loading = new Loading({$app, initialState : false});
 
     const setState = (nextState) => {
         this.state = nextState;
@@ -52,14 +55,13 @@ export default function App($app) {
             isRoot : this.state.isRoot,
             nodes : this.state.nodes,
         })
-        imageViews.setState(
-            this.state.selectedFilePath
-        )
+        imageViews.setState(this.state.selectedFilePath)
     }
 
 
     const init = async () => {
         try {
+            loading.showLoadingToggle();
             const rootNodes = await request();
             const nextState = {
                 ...this.state,
@@ -69,6 +71,8 @@ export default function App($app) {
             setState(nextState);
         } catch (err) {
             console.log(`Error : ${err}`);
+        } finally {
+            loading.showLoadingToggle();
         }
     }
     init();
